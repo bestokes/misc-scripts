@@ -1,0 +1,75 @@
+#!/bin/bash
+#
+# chkconfig: 2345 99 00
+# description: generic j2ee application
+#
+# generic init script for java -jar style application
+# replace 'application' with the relevant name.
+#
+#
+
+. /etc/rc.d/init.d/functions
+
+JAVA=/....../jdk1.7.0_51/bin/java
+APPLICATION_HOME=/servers/application-envname
+
+start() {
+
+                if [ -s /var/run/application.pid ]; then
+                        echo "application already running. pid $(cat /var/run/application.pid)"
+                        exit 1
+                fi
+                echo "Starting application"
+                $APPLICATION_HOME/start_application.sh 2>/$APPLICATION_HOME/logs/stderr.log 1>/$APPLICATION_HOME/logs/stdout.log &
+                PID=$!
+                echo $PID > /var/run/application.pid
+                if [ -s /var/run/application.pid ]; then
+                        echo_success
+			echo
+                else
+                        echo_failure
+			echo
+                fi
+}
+
+stop() {
+                if [ -f /var/run/application.pid ]
+                then
+                        echo "Stopping application"
+                        kill $(cat /var/run/application.pid)
+                        rm -f /var/run/application.pid
+			echo_success
+			echo
+                else
+                        echo_failure
+			echo
+                fi
+}
+
+status() {
+		PID=$(cat /var/run/application.pid 2>/dev/null)
+		if [ ! -z "${PID}" ]; then
+			echo "application is running. pid ${PID}"
+		else
+			echo "application is stopped."
+		fi
+}
+
+case $1 in
+        start)
+                start
+		;;
+        stop)
+                stop
+		;;
+	restart)
+		stop
+		sleep 2
+		start
+		;;
+	status)
+		status
+		;;
+        *)
+                echo "Usage: $0 [start|stop|restart|status]"
+esac
