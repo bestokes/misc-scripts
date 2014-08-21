@@ -20,7 +20,7 @@ start() {
                         exit 1
                 fi
                 echo "Starting application"
-                $APPLICATION_HOME/start_application.sh 2>/$APPLICATION_HOME/logs/stderr.log 1>/$APPLICATION_HOME/logs/stdout.log &
+                $JAVA -jar $APPLICATION_HOME/application.jar 2>/$APPLICATION_HOME/logs/stderr.log 1>/$APPLICATION_HOME/logs/stdout.log &
                 PID=$!
                 echo $PID > /var/run/application.pid
                 if [ -s /var/run/application.pid ]; then
@@ -38,8 +38,13 @@ stop() {
                         echo "Stopping application"
                         kill $(cat /var/run/application.pid)
                         rm -f /var/run/application.pid
-			echo_success
-			echo
+			if [ "$?" != "0" ]; then
+				echo_failure
+				echo
+			else
+				echo_success
+				echo
+			fi
                 else
                         echo_failure
 			echo
