@@ -51,13 +51,21 @@ stop() {
                 fi
 }
 
+
 status() {
-		PID=$(cat /var/run/application.pid 2>/dev/null)
-		if [ ! -z "${PID}" ]; then
-			echo "application is running. pid ${PID}"
-		else
+		if [ -f /var/run/application.pid ]; then
+			PID=$(cat /var/run/application.pid 2>/dev/null)
+			if [ -d "/proc/$PID" ]; then
+				echo "application is running. pid ${PID}"
+      				exit 0
+    			else
+      				echo "application has a stale pid file."
+      				exit 1
+    			fi
+  		else
 			echo "application is stopped."
-		fi
+  		fi
+
 }
 
 case $1 in
