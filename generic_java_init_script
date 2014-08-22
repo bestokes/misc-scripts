@@ -12,10 +12,11 @@
 
 JAVA=/....../jdk1.7.0_51/bin/java
 APPLICATION_HOME=/servers/application-envname
+PIDFILE=/var/run/application.pid
 
 start() {
 
-                if [ -s /var/run/application.pid ]; then
+                if [ -s ${PIDFILE} ]; then
                         echo "application already running. pid $(cat /var/run/application.pid)"
                         exit 1
                 fi
@@ -33,28 +34,35 @@ start() {
 }
 
 stop() {
-                if [ -f /var/run/application.pid ]
-                then
-                        echo "Stopping application"
-                        kill $(cat /var/run/application.pid)
-                        rm -f /var/run/application.pid
-			if [ "$?" != "0" ]; then
+        if [ -f ${PIDFILE} ]; then
+            echo "Stopping seyren"
+            kill $(cat ${PIDFILE})
+			if [ "$?" != "0" ]; then 
 				echo_failure
 				echo
+				exit 1
+			fi               
+            rm -f ${PIDFILE}
+			if [ "$?" != "0" ]; then 
+				echo_failure
+				echo
+				exit 1
 			else
 				echo_success
 				echo
+				exit 0
 			fi
-                else
-                        echo_failure
+        else
+            echo_failure
 			echo
-                fi
+			exit 1
+        fi
 }
 
 
 status() {
-		if [ -f /var/run/application.pid ]; then
-			PID=$(cat /var/run/application.pid 2>/dev/null)
+		if [ -f ${PIDFILE} ]; then
+			PID=$(cat ${PIDFILE} 2>/dev/null)
 			if [ -d "/proc/$PID" ]; then
 				echo "application is running. pid ${PID}"
       				exit 0
