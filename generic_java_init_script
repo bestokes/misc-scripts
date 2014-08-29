@@ -35,7 +35,7 @@ start() {
 
 stop() {
         if [ -f ${PIDFILE} ]; then
-            echo "Stopping seyren"
+            echo "Stopping application"
             kill $(cat ${PIDFILE})
 			if [ "$?" != "0" ]; then 
 				echo_failure
