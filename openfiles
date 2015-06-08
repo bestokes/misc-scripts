@@ -1,0 +1,47 @@
+#!/bin/bash
+#
+# chkconfig: 2345 99 00
+# description: j2ee compliant application server.
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+PID=/var/run/openfiles.pid
+USER=youruser
+GRAPHITE=yourgraphiteserver
+
+case $1 in
+	start)
+		if [ -s $PID ]; then 
+			echo "Refusing to start because PID file exists. PID $(cat $PID)."
+			echo_failure ; echo
+		else	
+			while true; do
+				echo "server.$(hostname --short).num_open_files $(/usr/sbin/lsof -u $USER | wc -l) $(date +%s)" | nc $GRAPHITE 2003
+ 				sleep 30
+			done &
+			echo $! > $PID
+			echo_success ; echo
+		fi	
+	;;
+	stop)
+		if [ -s $PID ]; then 
+			kill -9 $(cat $PID)
+			rm -f $PID
+			echo_success ; echo
+		else
+			echo "Could not find PID file."
+			echo_failure ; echo
+		fi		
+	;;
+	status)
+		if [ -s $PID ]; then 
+			echo "Running: PID $(cat $PID)."
+		else
+			echo "Not running or not PID file found."
+		fi
+	;;			
+	*)
+		echo "Usage $0 [start|stop|status]"
+	;;
+esac			
