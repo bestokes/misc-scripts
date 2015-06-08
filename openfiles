@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # chkconfig: 2345 99 00
-# description: j2ee compliant application server.
+# description: simple bash script for sending metrics to graphite.
 
 # Source function library.
 . /etc/rc.d/init.d/functions
