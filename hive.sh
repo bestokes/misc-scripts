@@ -65,27 +65,28 @@ function PostToGraphite() {
         done
 }
 
+function Login() {
+        if [ -f ${scriptDir}/credentials.json ]; then
+                if [ ! -f ${scriptDir}/sessid.out ]; then
+                        echo "INFO $(date +%d-%m-%Y,%H:%M) No session token found"
+                        GetHiveSession
+                else
+                        # start a new session if it is 110 minutes old
+                        # because api session tokens expire after 2 hours
+                        if [ -z "$(find "sessid.out" -mmin -110)" ]; then
+                                echo "INFO $(date +%d-%m-%Y,%H:%M) Old session timed out, getting new token"
+                                rm -r ${scriptDir}/hiveSession ${scriptDir}/sessid.out
+                                GetHiveSession
+                        fi
+                fi
+        else
+                echo "FATAL $(date +%d-%m-%Y,%H:%M) Could not find credentials.json"
+                exit 1
+        fi
+}
+
 echo "INFO $(date +%d-%m-%Y,%H:%M) Script starting up"
 
-if [ -f ${scriptDir}/credentials.json ]; then
-        if [ ! -f ${scriptDir}/sessid.out ]; then
-                echo "INFO $(date +%d-%m-%Y,%H:%M) No session token found"
-                GetHiveSession
-        else
-                # start a new session if it is 110 minutes old
-                # because api session tokens expire after 2 hours
-                if [ -z "$(find "sessid.out" -mmin -110)" ]; then
-                        echo "INFO $(date +%d-%m-%Y,%H:%M) Old session timed out, getting new token"
-                        rm -r ${scriptDir}/hiveSession ${scriptDir}/sessid.out
-                        GetHiveSession
-                fi
-        fi
-else
-        echo "FATAL $(date +%d-%m-%Y,%H:%M) Could not find credentials.json"
-        exit 1
-fi
-
-
+Login
 GetNodeData
-
 PostToGraphite
