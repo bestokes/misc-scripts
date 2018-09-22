@@ -1,4 +1,8 @@
 #!/bin/bash
+#
+# to do: get thermostat name from api. add a boost feature to script
+#
+
 
 export graphiteHost="127.0.0.1"
 export graphitePort="2003"
@@ -87,6 +91,26 @@ function Login() {
 
 echo "INFO $(date +%d-%m-%Y,%H:%M) Script starting up"
 
-Login
-GetNodeData
-PostToGraphite
+case $1 in; 
+
+        forever)
+                while true; do 
+                        Login
+                        GetNodeData
+                        PostToGraphite
+                        sleep 2m
+                done
+        ;;
+        
+        once)
+                Login
+                GetNodeData
+                PostToGraphite
+                exit 0
+        ;;
+        
+        *) 
+                echo "Usage: $0 [once|forever|boost]"
+                exit 0
+        ;;
+esac        
