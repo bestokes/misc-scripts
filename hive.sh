@@ -40,6 +40,22 @@ function GetNodeData() {
 }
 
 function PostToGraphite() {
+        if [ "${gotNodeData}" = "True" ]; then
+                batteryLevel=$(cat ${scriptDir}/nodes.out | jq '.nodes[2].attributes.batteryLevel.reportedValue')
+                actualTemperature=$(cat ${scriptDir}/nodes.out | jq '.nodes[4].attributes.temperature.reportedValue')
+                targetTemperature=$(cat ${scriptDir}/nodes.out | jq '.nodes[4].attributes.targetHeatTemperature.reportedValue')
+                boostOnOff=$(cat ${scriptDir}/nodes.out | jq '.nodes[4].attributes.activeHeatCoolMode.reportedValue' | awk -F'"' '{ print $2 }')
+                if [ "${boostOnOff}" = "OFF" ]; then
+                        boost=0
+                elif [ "${boost}" = "BOOST" ]; then
+                        boost=1
+                fi
+        else
+                batteryLevel=Null
+                actualTemperature=Null
+                targetTemperature=Null
+                boost=Null
+        fi
         echo "INFO $(date +%d-%m-%Y,%H:%M) Sending data to graphite"
         for metric in batterylevel insideTemperature targetTemperature boost; do
                 echo "thermie.$metric $(date +%s)" | nc -w 2 ${graphiteHost} ${graphitePort}
@@ -71,21 +87,5 @@ fi
 
 
 GetNodeData
-if [ "${gotNodeData}" = "True" ]; then
-        batteryLevel=$(cat ${scriptDir}/nodes.out | jq '.nodes[2].attributes.batteryLevel.reportedValue')
-        actualTemperature=$(cat ${scriptDir}/nodes.out | jq '.nodes[4].attributes.temperature.reportedValue')
-        targetTemperature=$(cat ${scriptDir}/nodes.out | jq '.nodes[4].attributes.targetHeatTemperature.reportedValue')
-        boostOnOff=$(cat ${scriptDir}/nodes.out | jq '.nodes[4].attributes.activeHeatCoolMode.reportedValue' | awk -F'"' '{ print $2 }')
-        if [ "${boostOnOff}" = "OFF" ]; then
-                boost=0
-        elif [ "${boost}" = "BOOST" ]; then
-                boost=1
-        fi
-else
-        batteryLevel=Null
-        actualTemperature=Null
-        targetTemperature=Null
-        boostBoolean=Null
-fi
 
 PostToGraphite
