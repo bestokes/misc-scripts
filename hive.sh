@@ -49,10 +49,10 @@ function PostToGraphite() {
                 actualTemperature=$(cat ${scriptDir}/nodes.out | jq '.nodes[4].attributes.temperature.reportedValue')
                 targetTemperature=$(cat ${scriptDir}/nodes.out | jq '.nodes[4].attributes.targetHeatTemperature.reportedValue')
                 boostOnOff=$(cat ${scriptDir}/nodes.out | jq '.nodes[4].attributes.activeHeatCoolMode.reportedValue' | awk -F'"' '{ print $2 }')
-                if [ "${boostOnOff}" = "OFF" ]; then
-                        boost=0
-                elif [ "${boost}" = "BOOST" ]; then
+                if [ "${boostOnOff}" = "BOOST" ]; then
                         boost=1
+		else
+			boost=0
                 fi
         else
                 batteryLevel=Null
@@ -61,12 +61,10 @@ function PostToGraphite() {
                 boost=Null
         fi
         echo "INFO $(date +%d-%m-%Y,%H:%M) Sending data to graphite"
-        for metric in batterylevel insideTemperature targetTemperature boost; do
-                echo "thermie.$metric $(date +%s)" | nc -w 2 ${graphiteHost} ${graphitePort}
-                if [ "$?" != "0" ]; then
-                        echo "ERROR $(date +%d-%m-%Y,%H:%M) Could not add metric thermie.$metric to graphite"
-                fi
-        done
+        echo "thermie.batterylevel ${batteryLevel} $(date +%s)"             | nc -w 2 ${graphiteHost} ${graphitePort}
+        echo "thermie.insideTemperature ${actualTemperature} $(date +%s)"   | nc -w 2 ${graphiteHost} ${graphitePort}
+        echo "thermie.targetTemperature ${targetTemperature} $(date +%s)"   | nc -w 2 ${graphiteHost} ${graphitePort}
+        echo "thermie.boost ${boost} $(date +%s)"	                    | nc -w 2 ${graphiteHost} ${graphitePort}
 }
 
 function Login() {
@@ -92,10 +90,10 @@ function Login() {
 echo "INFO $(date +%d-%m-%Y,%H:%M) Script starting up"
 
 if [ -z "$@" ]; then
-        echo "Missing argument"
-        exit 1
+	echo "Missing argument"
+	exit 1
 else
-        arg=$1
+	arg=$1
 fi
 
 case ${arg} in
