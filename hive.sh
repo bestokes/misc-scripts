@@ -91,26 +91,30 @@ function Login() {
 
 echo "INFO $(date +%d-%m-%Y,%H:%M) Script starting up"
 
-case $1 in; 
+if [ -z "$@" ]; then
+        echo "Missing argument"
+        exit 1
+else
+        arg=$1
+fi
 
+case ${arg} in
         forever)
-                while true; do 
+                while true; do
                         Login
                         GetNodeData
                         PostToGraphite
                         sleep 2m
                 done
         ;;
-        
         once)
                 Login
                 GetNodeData
                 PostToGraphite
                 exit 0
         ;;
-        
-        *) 
+        *)
                 echo "Usage: $0 [once|forever|boost]"
                 exit 0
         ;;
-esac        
+esac
