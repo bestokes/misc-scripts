@@ -1,7 +1,8 @@
 misc-scripts
 ============
 
-* **hive.sh**: a script which reads temperature and battery data from your hive thermostat and puts the values into graphite.
+* **hive.sh**: doesn't work anymore (just use homeassistant for this instead)
 * **openfiles**: count number of open files and sent to graphite. 
 * **generic_java_init_script**: init script for generic java app
-* **titles**: fetch video from iplayer for offline viewing (probably doesn't work anymore)
+* **sleepy-disk**: put disks to sleep when they are idle
+* **bins**: check the MSDC website and notify which bin needs putting out 
