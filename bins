@@ -33,7 +33,7 @@ if [ "$?" != "0" ]; then
 	echo "Curl failed!"
 	exit 1
 else
-	binColour=$(grep "$(date -d "+1 day" +"%A %d %B %Y")" ${curlResult} -B2 /tmp/tmp.jB48ErHTEe | head -2 | tail -1 | awk -F'>' '{ print $2 }' | awk -F'<' '{ print $1 }' | tr '[:upper:]' '[:lower:]')
+	binColour=$(grep "$(date -d "+1 day" +"%A %d %B %Y")" ${curlResult} -B2 | head -2 | tail -1 | awk -F'>' '{ print $2 }' | awk -F'<' '{ print $1 }' | tr '[:upper:]' '[:lower:]')
 	if [ ! -z "${binColour}" ]; then
 		echo "Tomorrow is ${binColour} day."
 		/usr/local/bin/telegram "Tomorrow is ${binColour} day."
