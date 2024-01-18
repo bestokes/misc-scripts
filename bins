@@ -1,33 +1,43 @@
 #!/bin/bash
 
+if [ ! -f /usr/local/bin/telegram ]; then 
+ echo "Could not find telegram binary."
+ exit 1
+fi
+
 curlResult=$(mktemp)
 
-curl -s 'https://www.midsussex.gov.uk/waste-recycling/bin-collection/' \
+curl 'https://www.midsussex.gov.uk/waste-recycling/bin-collection/' \
   -H 'authority: www.midsussex.gov.uk' \
+  -H 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' \
+  -H 'accept-language: en-GB,en-US;q=0.9,en;q=0.8' \
   -H 'cache-control: max-age=0' \
-  -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"' \
+  -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundaryMPVhKz024psfKBDW' \
+  -H 'cookie: .AspNetCore.Antiforgery.9fXoN5jHCXs=CfDJ8BYOjofrcRxKmwtx7KIuYJkqodLcND9dJp3RkFSs7QW68Qk2mOUrPv-y_8BiWiXWaRSK2Y2fDAA63BWISMbQqkARSUrZOw4qnCyy0xyYkKtyZ8jv5tY4uPSI6rNAD51iY6NCV6uI5vjIRihcjXxG5KM; CookieControl={"necessaryCookies":[],"optionalCookies":{"analytics":"accepted"},"statement":{},"consentDate":1694977386101,"consentExpiry":90,"interactedWith":true,"user":"EC8B390F-24DA-43E1-B1E0-77F47E87E227"}; nmstat=d82e67ee-9630-10c3-cef6-6a71c27186de' \
+  -H 'origin: https://www.midsussex.gov.uk' \
+  -H 'pragma: show-debug-headers' \
+  -H 'referer: https://www.midsussex.gov.uk/waste-recycling/bin-collection/' \
+  -H 'sec-ch-ua: "Chromium";v="116", "Not)A;Brand";v="24", "Google Chrome";v="116"' \
   -H 'sec-ch-ua-mobile: ?0' \
   -H 'sec-ch-ua-platform: "macOS"' \
-  -H 'upgrade-insecure-requests: 1' \
-  -H 'origin: https://www.midsussex.gov.uk' \
-  -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundaryIftXC885DLNi8k4r' \
-  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.83 Safari/537.36' \
-  -H 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9' \
-  -H 'sec-fetch-site: same-origin' \
-  -H 'sec-fetch-mode: navigate' \
-  -H 'sec-fetch-user: ?1' \
   -H 'sec-fetch-dest: document' \
-  -H 'referer: https://www.midsussex.gov.uk/waste-recycling/bin-collection/' \
-  -H 'accept-language: en-GB,en-US;q=0.9,en;q=0.8' \
-  --data-raw $'------WebKitFormBoundaryIftXC885DLNi8k4r\r\nContent-Disposition: form-data; name="PostCodeStep.strAddressSearch"\r\n\r\nbn6 8bg\r\n------WebKitFormBoundaryIftXC885DLNi8k4r\r\nContent-Disposition: form-data; name="AddressStep.strAddressSelect"\r\n\r\n2 NEWLANDS CLOSE BN6 8BG\r\n------WebKitFormBoundaryIftXC885DLNi8k4r\r\nContent-Disposition: form-data; name="Next"\r\n\r\ntrue\r\n------WebKitFormBoundaryIftXC885DLNi8k4r\r\nContent-Disposition: form-data; name="StepIndex"\r\n\r\n1\r\n------WebKitFormBoundaryIftXC885DLNi8k4r\r\nContent-Disposition: form-data; name="ufprt"\r\n\r\n72C560B1858C41929FCE5FB77300C6F7B5900D5FCC999596CD4FB16F9203FC5DF6AEB5538A581ED51A673770201FEE4991D7FF0F5294BA65746661F135EFC2C7D101A90D697D1A3B4FC871DAE8DFB37C8DD1F9D55BC862421FFEE4639085D0EF3D407E0BA0D69CD2E63C0A6A2EEB997373B36D46455890500AFD620CF0C0222748F1DA915F26100745BDD27F4F6CDC0F\r\n------WebKitFormBoundaryIftXC885DLNi8k4r--\r\n' \
+  -H 'sec-fetch-mode: navigate' \
+  -H 'sec-fetch-site: same-origin' \
+  -H 'sec-fetch-user: ?1' \
+  -H 'upgrade-insecure-requests: 1' \
+  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36' \
+  --data-raw $'------WebKitFormBoundaryMPVhKz024psfKBDW\r\nContent-Disposition: form-data; name="StrAddressSelect"\r\n\r\n2 NEWLANDS CLOSE BN6 8BG\r\n------WebKitFormBoundaryMPVhKz024psfKBDW\r\nContent-Disposition: form-data; name="submit"\r\n\r\n\r\n------WebKitFormBoundaryMPVhKz024psfKBDW\r\nContent-Disposition: form-data; name="__RequestVerificationToken"\r\n\r\nCfDJ8BYOjofrcRxKmwtx7KIuYJljlKikgtkvKGdooaEOWtTxzbYEiNwyXuH7cLs-52Lwjs0okaxXIPw9aoohLv04gITDw_30IV0HrCW9SnwgAhX98jMFa9sYhw7cB_VDmEumcADsfpX3jlGBxYtR9xdt-eY\r\n------WebKitFormBoundaryMPVhKz024psfKBDW\r\nContent-Disposition: form-data; name="ufprt"\r\n\r\nCfDJ8BYOjofrcRxKmwtx7KIuYJkRwNXUegLw0druGbLB_hxRa8dDrgE_Oe66aMWCSeFoWI2SlZAo-Rob7eji93oDE9Li4clZ4AIZedW9SXwJUeJpHKmPVIpxLk1To9Q1H8wYENLFrgqCy9_NJNVtDoMw91B8l-h-txgFj4WI5JgoCJw9\r\n------WebKitFormBoundaryMPVhKz024psfKBDW--\r\n' \
   --compressed > ${curlResult}
 
 if [ "$?" != "0" ]; then
-	echo "Curl failed."
+	echo "Curl failed!"
 	exit 1
 else
-	binColour=$(grep "$(date -d "+1 day" +"%A %d %B %Y")" ${curlResult} -B2 | head -1 | awk -F'>' '{ print $2 }' | awk -F'<' '{ print $1 }' | tr '[:upper:]' '[:lower:]')
-	echo "Tomorrow is ${binColour} bin day."
+	binColour=$(grep "$(date -d "+1 day" +"%A %d %B %Y")" ${curlResult} -B2 /tmp/tmp.jB48ErHTEe | head -2 | tail -1 | awk -F'>' '{ print $2 }' | awk -F'<' '{ print $1 }' | tr '[:upper:]' '[:lower:]')
+	if [ ! -z "${binColour}" ]; then
+		echo "Tomorrow is ${binColour} day."
+		/usr/local/bin/telegram "Tomorrow is ${binColour} day."
+	else
+		echo "No bin collections tomorrow."
+	fi
 fi
-
-/usr/local/bin/telegram "Tomorrow is ${binColour} bin day."
